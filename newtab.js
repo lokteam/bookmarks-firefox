@@ -138,6 +138,13 @@ document.addEventListener('DOMContentLoaded', () => {
       wallpaperLayer.style.backgroundImage = 'none';
       document.body.classList.remove('has-wallpaper');
     }
+
+    // Recalculate masonry layout heights if grid items are present
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        resizeAllGridItems();
+      });
+    });
   }
 
   async function saveSettings(newSettings) {
@@ -447,6 +454,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
       emptyState.style.display = 'none';
       bookmarksWorkspace.style.display = '';
+      resizeAllGridItems();
     }
   }
 
@@ -641,6 +649,39 @@ document.addEventListener('DOMContentLoaded', () => {
     emptyState.style.display = 'flex';
   }
 
+  // Adaptive JS Masonry: computes exact row span heights dynamically
+  function resizeAllGridItems() {
+    const container = bookmarksWorkspace;
+    if (!container || container.style.display === 'none') return;
+
+    const items = container.querySelectorAll(':scope > .folder-card');
+    if (items.length === 0) return;
+
+    // 1. Reset all spans to auto so we can measure their natural height
+    items.forEach(item => {
+      item.style.gridRowEnd = '';
+    });
+
+    // Force browser to recalculate layouts/heights
+    container.offsetHeight;
+
+    const rowHeight = 1; // 1px rows for maximum precision
+    // Read actual column-gap as the vertical gap
+    const style = window.getComputedStyle(container);
+    const gap = parseFloat(style.columnGap) || 35; // Default to 35px if columnGap is not computed
+
+    // 2. Compute and set row spans
+    items.forEach(item => {
+      if (item.style.display === 'none') {
+        item.style.gridRowEnd = '';
+        return;
+      }
+      const height = item.getBoundingClientRect().height;
+      const rowSpan = Math.ceil((height + gap) / rowHeight);
+      item.style.gridRowEnd = `span ${rowSpan}`;
+    });
+  }
+
   // ------------------------------------------------------------------------
   // 6. INSTANT CLIENT-SIDE DOM SEARCH
   // ------------------------------------------------------------------------
@@ -707,6 +748,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
       bookmarksWorkspace.style.display = '';
       emptyState.style.display = 'none';
+      resizeAllGridItems();
     }
   }
 
@@ -897,6 +939,10 @@ document.addEventListener('DOMContentLoaded', () => {
       performLocalSearch();
       searchInput.focus();
     });
+
+    // Resize masonry grid on window actions
+    window.addEventListener('resize', resizeAllGridItems);
+    window.addEventListener('load', resizeAllGridItems);
   }
 
   // ------------------------------------------------------------------------
