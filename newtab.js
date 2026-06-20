@@ -438,7 +438,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Programmatically handle Google subdomains by pointing to their official high-res SVG branding logos on gstatic.
       // If a specific service doesn't have an SVG logo there, the image loading fails and img.onerror will cleanly
-      // fall back to standard faviconV2, then to DuckDuckGo, then to the letter avatar.
+      // fall back to standard faviconV2, then to local fallback, then to the letter avatar.
       if ((hostname.endsWith('.google.com') || hostname.endsWith('.google')) && hostname !== 'google.com' && !hostname.startsWith('www.')) {
         // Extract the main subdomain (e.g. "tasks" from "tasks.google.com")
         let subdomain = hostname.split('.')[0];
@@ -452,16 +452,6 @@ document.addEventListener('DOMContentLoaded', () => {
       return `https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${encodeURIComponent(parsed.origin)}&size=64`;
     } catch (e) {
       return `https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${encodeURIComponent(url)}&size=64`;
-    }
-  }
-
-  // Fallback to DuckDuckGo's favicon API which parses target HTML and resolves subdomains/subpaths dynamically
-  function getDuckDuckGoFaviconUrl(url) {
-    try {
-      const parsed = new URL(url);
-      return `https://icons.duckduckgo.com/ip3/${parsed.hostname}.ico`;
-    } catch (e) {
-      return '';
     }
   }
 
@@ -481,19 +471,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Google high-resolution favicon cache with smart fallback & overrides
     const favUrl = getFaviconUrl(bookmark.url);
-    const ddgFavUrl = getDuckDuckGoFaviconUrl(bookmark.url);
     const img = document.createElement('img');
     img.src = favUrl;
     img.alt = '';
     
-    // Multi-tiered programmatic fallback chain:
+    // Programmatic fallback chain:
     // Tier 1: gstatic branding SVG (for Google subdomains)
     // Tier 2: standard Google faviconV2 (origin-based)
-    // Tier 3: Direct root /favicon.svg request
-    // Tier 4: Direct root /favicon.png request
-    // Tier 5: Direct root /favicon.ico request
-    // Tier 6: DuckDuckGo favicon API (HTML-parser based)
-    // Tier 7: Dynamic letter-gradient avatar fallback
+    // Tier 3: Direct root /favicon.ico request (highly robust fallback for local/intranet sites)
+    // Tier 4: Dynamic letter-gradient avatar fallback
     let currentTier = 1;
     
     img.onerror = () => {
@@ -510,32 +496,15 @@ document.addEventListener('DOMContentLoaded', () => {
         currentTier = 2;
         if (origin) {
           img.src = `https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${encodeURIComponent(origin)}&size=64`;
-        } else if (ddgFavUrl) {
-          img.src = ddgFavUrl;
         } else {
-          currentTier = 6;
+          currentTier = 3;
           img.onerror();
         }
       } 
-      // If Tier 1 (standard Google faviconV2) or Tier 2 failed, try direct /favicon.svg
+      // If Tier 1 (standard Google faviconV2) or Tier 2 failed, try direct /favicon.ico (extremely useful for localhost/local network sites)
       else if (currentTier <= 2 && origin) {
         currentTier = 3;
-        img.src = `${origin}/favicon.svg`;
-      } 
-      // If direct /favicon.svg failed, try direct /favicon.png
-      else if (currentTier === 3 && origin) {
-        currentTier = 4;
-        img.src = `${origin}/favicon.png`;
-      } 
-      // If direct /favicon.png failed, try direct /favicon.ico
-      else if (currentTier === 4 && origin) {
-        currentTier = 5;
         img.src = `${origin}/favicon.ico`;
-      } 
-      // If direct /favicon.ico failed, fall back to DuckDuckGo favicon API
-      else if (currentTier <= 5 && ddgFavUrl) {
-        currentTier = 6;
-        img.src = ddgFavUrl;
       } 
       // Finally, draw the beautiful dynamic letter-gradient avatar
       else {
