@@ -25,6 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // 2. DOM ELEMENTS
   // ------------------------------------------------------------------------
   
+  const searchForm = document.getElementById('search-form');
   const searchInput = document.getElementById('search-input');
   const searchClearBtn = document.getElementById('search-clear-btn');
   
@@ -701,6 +702,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Live search bindings
+    searchForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+    });
+
     searchInput.addEventListener('input', performLocalSearch);
 
     searchClearBtn.addEventListener('click', () => {
