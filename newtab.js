@@ -434,9 +434,21 @@ document.addEventListener('DOMContentLoaded', () => {
   function getFaviconUrl(url) {
     try {
       const parsed = new URL(url);
-      // We directly target the root origin (protocol + host) instead of the full URL with subpaths
-      // because subpaths often fail to resolve in high-res and trigger generic 32x32 fallbacks on Google's backend.
-      // Also, we query faviconV2 directly to bypass slow legacy 301 network redirects.
+      const hostname = parsed.hostname.toLowerCase();
+
+      // Programmatically handle Google subdomains by pointing to their official high-res SVG branding logos on gstatic.
+      // If a specific service doesn't have an SVG logo there, the image loading fails and img.onerror will cleanly
+      // fall back to standard faviconV2, then to DuckDuckGo, then to the letter avatar.
+      if ((hostname.endsWith('.google.com') || hostname.endsWith('.google')) && hostname !== 'google.com' && !hostname.startsWith('www.')) {
+        // Extract the main subdomain (e.g. "tasks" from "tasks.google.com")
+        let subdomain = hostname.split('.')[0];
+        if (subdomain === 'mail') {
+          subdomain = 'gmail';
+        }
+        return `https://www.gstatic.com/images/branding/productlogos/${subdomain}_2026/v2/web/192px.svg`;
+      }
+
+      // Default to Google's faviconV2 targeting the root origin to bypass subpath-related crawler failures and 301 redirects
       return `https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${encodeURIComponent(parsed.origin)}&size=64`;
     } catch (e) {
       return `https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${encodeURIComponent(url)}&size=64`;
@@ -474,13 +486,31 @@ document.addEventListener('DOMContentLoaded', () => {
     img.src = favUrl;
     img.alt = '';
     
-    // Fallback chain in case of network block, offline state, or loading error
-    let usingFallback = false;
+    // Multi-tiered programmatic fallback chain:
+    // Tier 1: gstatic branding SVG (for Google subdomains)
+    // Tier 2: standard Google faviconV2 (origin-based)
+    // Tier 3: DuckDuckGo favicon API (HTML-parser based)
+    // Tier 4: Dynamic letter-gradient avatar fallback
+    let currentTier = 1;
+    
     img.onerror = () => {
-      if (!usingFallback && ddgFavUrl) {
-        usingFallback = true;
+      // If we initially tried to load from gstatic branding SVG and it failed, fall back to Google faviconV2
+      if (currentTier === 1 && favUrl.includes('gstatic.com/images/branding/productlogos/')) {
+        currentTier = 2;
+        try {
+          const parsed = new URL(bookmark.url);
+          img.src = `https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${encodeURIComponent(parsed.origin)}&size=64`;
+        } catch (e) {
+          img.src = ddgFavUrl;
+        }
+      } 
+      // If Google faviconV2 failed, fall back to DuckDuckGo favicon API
+      else if (currentTier <= 2 && ddgFavUrl) {
+        currentTier = 3;
         img.src = ddgFavUrl;
-      } else {
+      } 
+      // Finally, draw the beautiful dynamic letter-gradient avatar
+      else {
         const fallback = document.createElement('div');
         fallback.className = 'app-fallback-icon';
         fallback.style.background = getGradientForString(bookmark.domain || bookmark.title || 'app');
