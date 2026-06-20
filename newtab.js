@@ -189,9 +189,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // File upload label update
     if (localWallpaperBase64) {
-      localBgFilename.textContent = 'Изображение загружено';
+      localBgFilename.textContent = 'Image uploaded';
     } else {
-      localBgFilename.textContent = 'Файл не выбран';
+      localBgFilename.textContent = 'No file chosen';
     }
 
     buildCustomIconsListUI();
@@ -207,7 +207,7 @@ document.addEventListener('DOMContentLoaded', () => {
       emptyMsg.className = 'help-text';
       emptyMsg.style.textAlign = 'center';
       emptyMsg.style.padding = '0.5rem 0';
-      emptyMsg.textContent = 'Нет кастомных иконок';
+      emptyMsg.textContent = 'No custom icons';
       customIconsList.appendChild(emptyMsg);
       return;
     }
@@ -234,7 +234,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const deleteBtn = document.createElement('button');
       deleteBtn.className = 'custom-icon-delete';
-      deleteBtn.setAttribute('aria-label', 'Удалить правило');
+      deleteBtn.setAttribute('aria-label', 'Delete rule');
       deleteBtn.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
 
       deleteBtn.addEventListener('click', async () => {
@@ -283,10 +283,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // ------------------------------------------------------------------------
   
   async function loadBookmarks() {
-    bookmarksCountBadge.textContent = 'Чтение закладок...';
+    bookmarksCountBadge.textContent = 'Loading bookmarks...';
     try {
       if (typeof browser === 'undefined' || !browser.bookmarks) {
-        throw new Error('Bookmarks API недоступно');
+        throw new Error('Bookmarks API is unavailable');
       }
 
       const tree = await browser.bookmarks.getTree();
@@ -305,13 +305,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Count total links in compiled tree
       const totalLinks = countLinksInTree(bookmarkTreeRoot);
-      bookmarksCountBadge.textContent = `Приложений: ${totalLinks}`;
+      bookmarksCountBadge.textContent = `Shortcuts: ${totalLinks}`;
       
       renderBookmarksTree();
 
     } catch (e) {
       console.error('Error compiling bookmarks hierarchy:', e);
-      bookmarksCountBadge.textContent = 'Демо-режим';
+      bookmarksCountBadge.textContent = 'Demo Mode';
       
       // Fallback design mockups for design review
       bookmarkTreeRoot = getDesignMockups();
@@ -325,7 +325,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (node.id === 'menu________') return node;
     
     const title = (node.title || '').toLowerCase();
-    if (title === 'меню закладок' || title === 'bookmarks menu' || title === 'bookmarksmenu') {
+    if (title === '\u043c\u0435\u043d\u044e \u0437\u0430\u043a\u043b\u0430\u0434\u043e\u043a' || title === 'bookmarks menu' || title === 'bookmarksmenu') {
       return node;
     }
 
@@ -347,7 +347,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return {
         id: node.id,
         type: 'bookmark',
-        title: node.title || getDomainName(node.url) || 'Приложение',
+        title: node.title || getDomainName(node.url) || 'App',
         url: node.url,
         domain: getDomainName(node.url)
       };
@@ -372,12 +372,12 @@ document.addEventListener('DOMContentLoaded', () => {
       if (childrenCompiled.length > 0) {
         let folderTitle = node.title || '';
         if (node.id === 'menu________' || node.id === 'root________') {
-          folderTitle = 'Главная';
+          folderTitle = 'Home';
         }
         return {
           id: node.id,
           type: 'folder',
-          title: folderTitle || 'Папка',
+          title: folderTitle || 'Folder',
           children: childrenCompiled,
           hasBookmarks: hasBookmarksRecursively
         };
@@ -433,11 +433,11 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // 1. If direct bookmarks exist in the Bookmarks Menu, group them in a 'Главная' card
+    // 1. If direct bookmarks exist in the Bookmarks Menu, group them in a 'Home' card
     if (rootBookmarks.length > 0) {
       const rootFolderCard = createFolderCardDOM({
         id: 'root-bookmarks-folder',
-        title: 'Главная',
+        title: 'Home',
         children: rootBookmarks
       }, false);
       bookmarksWorkspace.appendChild(rootFolderCard);
@@ -812,7 +812,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const path = customIconPath.value.trim();
 
       if (!pattern || !path) {
-        alert('Пожалуйста, заполните оба поля: домен/URL и путь к иконке.');
+        alert('Please fill in both fields: domain/URL and icon path.');
         return;
       }
 
@@ -839,7 +839,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const url = e.target.value.trim();
       // If a web URL is written, clear local image wallpaper to avoid overlap
       localWallpaperBase64 = '';
-      localBgFilename.textContent = 'Файл не выбран';
+      localBgFilename.textContent = 'No file chosen';
       await browser.storage.local.remove('localWallpaperBase64');
       await saveSettings({ bgCustomUrl: url });
       buildSettingsPanel();
@@ -855,7 +855,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const file = e.target.files[0];
       if (!file) return;
 
-      localBgFilename.textContent = 'Загрузка...';
+      localBgFilename.textContent = 'Uploading...';
 
       const reader = new FileReader();
       reader.onload = async (event) => {
@@ -871,8 +871,8 @@ document.addEventListener('DOMContentLoaded', () => {
           buildSettingsPanel();
         } catch (err) {
           console.error('Failed to save uploaded image:', err);
-          alert('Ошибка при сохранении файла. Пожалуйста, попробуйте картинку меньшего размера (рекомендуется сжатый JPG/PNG).');
-          localBgFilename.textContent = 'Ошибка загрузки';
+          alert('Error saving the file. Please try a smaller image size (compressed JPG/PNG is recommended).');
+          localBgFilename.textContent = 'Upload error';
         }
       };
       reader.readAsDataURL(file);
@@ -905,7 +905,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Delete wallpapers completely
     clearBgBtn.addEventListener('click', async () => {
       localWallpaperBase64 = '';
-      localBgFilename.textContent = 'Файл не выбран';
+      localBgFilename.textContent = 'No file chosen';
       localBgInput.value = '';
       customBgInput.value = '';
       await browser.storage.local.remove('localWallpaperBase64');
@@ -915,9 +915,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Reset settings button
     resetSettingsBtn.addEventListener('click', async () => {
-      if (confirm('Сбросить параметры лончера к стандартным?')) {
+      if (confirm('Reset launcher settings to defaults?')) {
         localWallpaperBase64 = '';
-        localBgFilename.textContent = 'Файл не выбран';
+        localBgFilename.textContent = 'No file chosen';
         localBgInput.value = '';
         await browser.storage.local.remove('localWallpaperBase64');
         await saveSettings(DEFAULTS);
@@ -953,13 +953,13 @@ document.addEventListener('DOMContentLoaded', () => {
     return {
       id: 'mock-root',
       type: 'folder',
-      title: 'Главная',
+      title: 'Home',
       hasBookmarks: true,
       children: [
         {
           id: 'mock-1',
           type: 'folder',
-          title: 'Соцсети и стримы',
+          title: 'Social & Streams',
           hasBookmarks: true,
           children: [
             { type: 'bookmark', title: 'YouTube', url: 'https://youtube.com', domain: 'youtube.com' },
@@ -971,7 +971,7 @@ document.addEventListener('DOMContentLoaded', () => {
         {
           id: 'mock-2',
           type: 'folder',
-          title: 'Разработка',
+          title: 'Development',
           hasBookmarks: true,
           children: [
             { type: 'bookmark', title: 'GitHub', url: 'https://github.com', domain: 'github.com' },
@@ -980,7 +980,7 @@ document.addEventListener('DOMContentLoaded', () => {
             {
               id: 'mock-2-nested',
               type: 'folder',
-              title: 'Справочники и доки',
+              title: 'Docs & References',
               hasBookmarks: true,
               children: [
                 { type: 'bookmark', title: 'MDN Web Docs', url: 'https://developer.mozilla.org', domain: 'developer.mozilla.org' },
@@ -993,10 +993,10 @@ document.addEventListener('DOMContentLoaded', () => {
         {
           id: 'mock-3',
           type: 'folder',
-          title: 'Медиа',
+          title: 'Media',
           hasBookmarks: true,
           children: [
-            { type: 'bookmark', title: 'Кинопоиск', url: 'https://kinopoisk.ru', domain: 'kinopoisk.ru' },
+            { type: 'bookmark', title: 'Kinopoisk', url: 'https://kinopoisk.ru', domain: 'kinopoisk.ru' },
             { type: 'bookmark', title: 'Netflix', url: 'https://netflix.com', domain: 'netflix.com' }
           ]
         }
