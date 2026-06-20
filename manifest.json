@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "LokBookmarks",
   "version": "1.0.0",
-  "description": "Заменяет новую вкладку на красивую, настраиваемую и функциональную страницу с вашими закладками.",
+  "description": "Replaces the new tab with a beautiful, customizable, and functional page of your bookmarks.",
   "icons": {
     "32": "icon.svg",
     "64": "icon.svg",
