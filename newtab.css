@@ -587,13 +587,12 @@ body.has-wallpaper::before {
   width: 100%;
 }
 
-/* Apps grid (Columns match settings selection, fixed width columns) */
+/* Apps grid (Columns match settings selection, stretching content) */
 .apps-grid {
   display: grid;
-  grid-template-columns: repeat(var(--folder-columns, 4), var(--app-tile-width));
+  grid-template-columns: repeat(var(--folder-columns, 4), 1fr);
   gap: var(--grid-gap);
-  width: max-content;
-  max-width: 100%;
+  width: 100%;
 }
 
 /* 5. Bookmarks Folder Nesting (Folders Inside Folders) */
@@ -625,17 +624,17 @@ body.has-wallpaper::before {
   align-items: center;
   text-decoration: none;
   cursor: pointer;
-  width: var(--app-tile-width);
+  width: 100%;
   transition: transform var(--transition-normal);
   user-select: none;
 }
 
 .app-icon-wrapper {
-  width: var(--app-icon-size);
-  height: var(--app-icon-size);
+  width: 70%;
+  aspect-ratio: 1 / 1;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: var(--app-icon-radius);
+  border-radius: 24%;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15), inset 0 1px 1px rgba(255, 255, 255, 0.03);
   display: flex;
   align-items: center;
@@ -651,8 +650,8 @@ body.has-wallpaper::before {
 }
 
 .app-icon-wrapper img {
-  width: 24px;
-  height: 24px;
+  width: 48%;
+  height: 48%;
   object-fit: contain;
   transition: transform var(--transition-normal);
 }
