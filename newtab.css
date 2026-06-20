@@ -117,20 +117,20 @@
 }
 
 /* ------------------------------------------------------------------------
-   THEME 4: TOKYO NIGHT (Storm / Day)
+   THEME 4: TOKYO NIGHT MOON
    ------------------------------------------------------------------------ */
 .theme-tokyonight.theme-dark {
-  --bg-color: #24283b;
-  --text-main: #c0caf5;
-  --text-muted: #9aa5ce;
-  --bg-card: rgba(31, 35, 53, 0.65);
+  --bg-color: #222436;
+  --text-main: #e9e9ed;
+  --text-muted: #a9b1d6;
+  --bg-card: rgba(30, 32, 48, 0.65);
   --border-card: rgba(255, 255, 255, 0.07);
   --border-hover: rgba(125, 207, 255, 0.4);
   --shadow-main: 0 10px 40px rgba(0, 0, 0, 0.25);
   --blur-amount: 24px;
-  --accent-color-1: #7dcfff;
-  --accent-color-2: #bb9af7;
-  --accent-glow: rgba(125, 207, 255, 0.3);
+  --accent-color-1: #c099ff;
+  --accent-color-2: #7dcfff;
+  --accent-glow: rgba(192, 153, 255, 0.3);
   --accent-gradient: linear-gradient(135deg, var(--accent-color-1) 0%, var(--accent-color-2) 100%);
 }
 .theme-tokyonight.theme-light {
