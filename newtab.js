@@ -490,7 +490,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Tier 1: gstatic branding SVG (for Google subdomains)
     // Tier 2: standard Google faviconV2 (origin-based)
     // Tier 3: DuckDuckGo favicon API (HTML-parser based)
-    // Tier 4: Dynamic letter-gradient avatar fallback
+    // Tier 4: Direct root /favicon.ico request
+    // Tier 5: Dynamic letter-gradient avatar fallback
     let currentTier = 1;
     
     img.onerror = () => {
@@ -509,6 +510,17 @@ document.addEventListener('DOMContentLoaded', () => {
         currentTier = 3;
         img.src = ddgFavUrl;
       } 
+      // If DuckDuckGo also failed, try to load direct /favicon.ico from the site's origin
+      else if (currentTier === 3) {
+        currentTier = 4;
+        try {
+          const parsed = new URL(bookmark.url);
+          img.src = `${parsed.origin}/favicon.ico`;
+        } catch (e) {
+          currentTier = 5;
+          img.onerror();
+        }
+      }
       // Finally, draw the beautiful dynamic letter-gradient avatar
       else {
         const fallback = document.createElement('div');
