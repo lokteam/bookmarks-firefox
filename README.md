@@ -1,74 +1,35 @@
-# LokBookmarks — Красивая стартовая страница для Firefox
+# LokBookmarks
 
-**LokBookmarks** — это современное и быстрое расширение для Mozilla Firefox, которое заменяет стандартную стартовую страницу (новую вкладку) на элегантную, высокопроизводительную и полностью настраиваемую панель с вашими собственными закладками.
+**LokBookmarks** is a highly aesthetic, high-performance, and fully customizable start page (New Tab) browser extension designed for Mozilla Firefox (built with Manifest V3). It replaces the default start page with an elegant, responsive dashboard organizing your local bookmarks.
 
----
+## ✨ Core Features
 
-## ✨ Основные возможности
+1. **Local Bookmark Integration**:
+   - Loads your native Firefox bookmarks instantly and securely without external services.
+   - Organizes them into logical category cards (folders) with toggleable sections to keep the workspace clean.
 
-1. **Мгновенная интеграция с закладками**:
-   - Автоматически подхватывает все закладки из вашего профиля Firefox.
-   - Организует их в виде аккуратных визуальных карточек-категорий.
-   - Поддерживает сворачивание/разворачивание больших папок для сохранения чистоты экрана.
+2. **Adaptive Masonry & Responsive Grid**:
+   - Uses an advanced CSS Grid and JavaScript-based adaptive folder masonry layout.
+   - Automatically distributes bookmarks across self-adjusting columns with full responsive support.
+   - Adapts container proportions with dynamic icon scaling as workspace sections expand or contract.
 
-2. **Интерактивный виджет в центре**:
-   - Красивые цифровые часы высокого разрешения и календарь.
-   - Персонализированное приветствие, меняющееся в зависимости от времени суток (*Доброе утро*, *Добрый день*, *Добрый вечер*, *Доброй ночи*).
-   - **Интерактивное имя**: кликните прямо по вашему имени на главном экране, чтобы изменить его — оно мгновенно сохранится!
+3. **Multi-Tier Robust Icon Fallback**:
+   - Implements a dynamic programmatic favicon and SVG loader with high-performance fallbacks.
+   - Direct resolution of Google domains/subdomains to high-res `gstatic` SVGs.
+   - Multi-tier fallback chain: format-ordered direct site requests -> Google FaviconV2 -> high-quality generated vector avatar with a custom initials/gradient based on the site domain.
 
-3. **Умный поиск (Омнибар)**:
-   - Мгновенная фильтрация карточек закладок по мере ввода текста (поиск по названию, домену или URL).
-   - Если совпадений в закладках нет, кнопка «Искать в интернете» позволит сразу продолжить поиск.
-   - Поддержка открытия сайтов напрямую (если вы ввели `yandex.ru` или `https://github.com`, страница сразу перейдёт на этот сайт).
-   - Выбор любимой поисковой системы (Google, Яндекс, DuckDuckGo, Bing).
+4. **Interactive Dashboard & Widgets**:
+   - High-definition live digital clock and greeting adapted to the time of day.
+   - Interactive, inline editable user greeting (click to change and persist name instantly).
+   - Omnibar for instant incremental searching/filtering across all categories. Allows direct URL navigation and searching via customizable search engines (Google, Yandex, DuckDuckGo, Bing).
 
-4. **Великолепный дизайн и настройки (Glassmorphic UI)**:
-   - Тонкий, эстетичный полупрозрачный интерфейс с эффектом размытия заднего плана (Glassmorphism).
-   - Встроенная поддержка тёмной и светлой тем с возможностью автоматического переключения по системным настройкам.
-   - 10 тщательно подобранных цветовых градиентов для фона (Slate, Midnight, Sunset Nebula, Forest, Mint, Sakura и др.).
-   - Возможность вставить ссылку на любую свою фоновую картинку (например, из Unsplash).
-   - Выбор плотности отображения (компактный вид для экономии места).
-   - Настройка сетки: выбор количества колонок (автоматическая адаптация или фиксированные 2, 3, 4 колонки).
+5. **Glassmorphic UI & Styling**:
+   - Exquisite frosted-glass design (glassmorphic UI) with smooth transitions and customizable backdrop blur.
+   - Curated color themes (such as Tokyo Night Moon theme accents, Sunset Nebula, Emerald, Forest, etc.) and custom image wallpaper support.
+   - Automatic light/dark mode syncing with system preferences, alongside manual toggles.
+   - Column configuration and layout density control (compact vs roomy modes).
 
----
+## 🛡️ Privacy & Security
 
-## 📂 Структура проекта
-
-Расширение спроектировано в соответствии с требованиями **Manifest V3 для Firefox**:
-
-```
-lokbookmarks/
-├── manifest.json       # Конфигурация, разрешения и переопределение новой вкладки
-├── icon.svg            # Векторная масштабируемая иконка расширения
-├── newtab.html         # Структура стартовой страницы
-├── newtab.css          # Стили оформления, адаптивная сетка и темы
-├── newtab.js           # Логика загрузки закладок, часы, поиск и хранение настроек
-└── README.md           # Документация и инструкции по запуску
-```
-
----
-
-## 🛠️ Как установить и запустить расширение в Firefox
-
-Поскольку расширение разработано локально, вы можете легко установить его во временном режиме разработчика для тестирования:
-
-### Шаг 1: Откройте страницу отладки Firefox
-1. Запустите браузер Firefox.
-2. В адресной строке введите `about:debugging` и нажмите **Enter**.
-
-### Шаг 2: Загрузите расширение
-1. На левой панели выберите вкладку **«Этот Firefox»** (This Firefox).
-2. Нажмите на кнопку **«Загрузить временный инструмент...»** (Load Temporary Add-on...).
-3. Перейдите в папку с проектом `/home/al/Projects/lokbookmarks/` и выберите **любой файл** в ней (например, `manifest.json`).
-
-### Шаг 3: Проверьте результат!
-1. Откройте новую вкладку в Firefox (сочетание клавиш `Ctrl + T` или `Cmd + T`).
-2. Вы увидите вашу новую великолепную страницу закладок с часами, приветствием и поиском!
-3. Кликните по шестерёнке в правом верхнем углу, чтобы настроить цвета, компактность или поисковую систему по своему вкусу.
-
----
-
-## 🛡️ Конфиденциальность и Безопасность
-
-* Расширение **не собирает и не отправляет никаких данных** на сторонние серверы. Все ваши закладки и настройки обрабатываются исключительно на вашем компьютере внутри браузера через безопасное API `browser.bookmarks` и `browser.storage.local`.
-* Мы используем умный алгоритм генерации фоновых аватарок: если у сайта нет фавиконки (или вы оффлайн), расширение мгновенно генерирует красивую градиентную иконку с первой буквой домена на основе хэш-кода названия. Это гарантирует 100% приватность и высокую скорость загрузки без лишних запросов в сеть!
+* **100% Client-Side**: All bookmark loading, query filtering, and preference adjustments are processed locally using Firefox's secure `browser.bookmarks` and `browser.storage.local` APIs.
+* **No Tracking**: No external analytics, trackers, or telemetry are used.
