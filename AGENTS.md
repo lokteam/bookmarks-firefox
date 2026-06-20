@@ -29,7 +29,7 @@ To ensure robust version control and allow clean, painless rollbacks of specific
 
 1. **No Site-Specific Hardcoded Solutions:**
    * **Do not** hardcode list-specific or site-specific exceptions, mappings, or workarounds (e.g., hardcoding individual subdomains like `tasks.google.com` to specific static CDN paths inside JS or CSS) to solve general programmatic or layout issues.
-   * Such solutions are extremely fragile, do not scale, violate architectural separation of concerns, and represent very poor design quality ("залупа конская").
+   * Such solutions are extremely fragile, do not scale, violate architectural separation of concerns, and represent very poor design quality.
    * Always design and implement clean, generic, and robust programmatic workflows that handle all domains and URLs dynamically. Site-specific overrides are strictly prohibited unless the user explicitly insists on or requests such an approach.
 
 ## Language & Documentation Rules
