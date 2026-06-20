@@ -489,38 +489,54 @@ document.addEventListener('DOMContentLoaded', () => {
     // Multi-tiered programmatic fallback chain:
     // Tier 1: gstatic branding SVG (for Google subdomains)
     // Tier 2: standard Google faviconV2 (origin-based)
-    // Tier 3: DuckDuckGo favicon API (HTML-parser based)
-    // Tier 4: Direct root /favicon.ico request
-    // Tier 5: Dynamic letter-gradient avatar fallback
+    // Tier 3: Direct root /favicon.svg request
+    // Tier 4: Direct root /favicon.png request
+    // Tier 5: Direct root /favicon.ico request
+    // Tier 6: DuckDuckGo favicon API (HTML-parser based)
+    // Tier 7: Dynamic letter-gradient avatar fallback
     let currentTier = 1;
     
     img.onerror = () => {
+      // Extract origin for direct requests
+      let origin = '';
+      try {
+        origin = new URL(bookmark.url).origin;
+      } catch (e) {
+        origin = '';
+      }
+
       // If we initially tried to load from gstatic branding SVG and it failed, fall back to Google faviconV2
       if (currentTier === 1 && favUrl.includes('gstatic.com/images/branding/productlogos/')) {
         currentTier = 2;
-        try {
-          const parsed = new URL(bookmark.url);
-          img.src = `https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${encodeURIComponent(parsed.origin)}&size=64`;
-        } catch (e) {
+        if (origin) {
+          img.src = `https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${encodeURIComponent(origin)}&size=64`;
+        } else if (ddgFavUrl) {
           img.src = ddgFavUrl;
-        }
-      } 
-      // If Google faviconV2 failed, fall back to DuckDuckGo favicon API
-      else if (currentTier <= 2 && ddgFavUrl) {
-        currentTier = 3;
-        img.src = ddgFavUrl;
-      } 
-      // If DuckDuckGo also failed, try to load direct /favicon.ico from the site's origin
-      else if (currentTier === 3) {
-        currentTier = 4;
-        try {
-          const parsed = new URL(bookmark.url);
-          img.src = `${parsed.origin}/favicon.ico`;
-        } catch (e) {
-          currentTier = 5;
+        } else {
+          currentTier = 6;
           img.onerror();
         }
-      }
+      } 
+      // If Tier 1 (standard Google faviconV2) or Tier 2 failed, try direct /favicon.svg
+      else if (currentTier <= 2 && origin) {
+        currentTier = 3;
+        img.src = `${origin}/favicon.svg`;
+      } 
+      // If direct /favicon.svg failed, try direct /favicon.png
+      else if (currentTier === 3 && origin) {
+        currentTier = 4;
+        img.src = `${origin}/favicon.png`;
+      } 
+      // If direct /favicon.png failed, try direct /favicon.ico
+      else if (currentTier === 4 && origin) {
+        currentTier = 5;
+        img.src = `${origin}/favicon.ico`;
+      } 
+      // If direct /favicon.ico failed, fall back to DuckDuckGo favicon API
+      else if (currentTier <= 5 && ddgFavUrl) {
+        currentTier = 6;
+        img.src = ddgFavUrl;
+      } 
       // Finally, draw the beautiful dynamic letter-gradient avatar
       else {
         const fallback = document.createElement('div');
