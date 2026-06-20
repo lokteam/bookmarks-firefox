@@ -360,7 +360,7 @@ body.no-glow .blob {
   opacity: 0;
   transition: opacity 0.8s ease, filter 0.3s ease;
   filter: blur(var(--bg-blur, 0px));
-  transform: scale(1.05); /* Предотвращает белые/темные края при размытии */
+  transform: scale(1.05); /* Prevents white/dark edges when blurring */
 }
 
 body.has-wallpaper .bg-wallpaper {
