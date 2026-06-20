@@ -14,7 +14,8 @@ document.addEventListener('DOMContentLoaded', () => {
     folderColumns: 4,
     bgCustomUrl: '',
     bgOpacity: 75,
-    bgBlur: 0
+    bgBlur: 0,
+    customIcons: []
   };
 
   let settings = { ...DEFAULTS };
@@ -42,6 +43,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const customThemeSelect = document.getElementById('custom-theme-select');
   const folderColumnsSelect = document.getElementById('folder-columns-select');
   const glowEffectToggle = document.getElementById('glow-effect-toggle');
+
+  const customIconsList = document.getElementById('custom-icons-list');
+  const customIconPattern = document.getElementById('custom-icon-pattern');
+  const customIconPath = document.getElementById('custom-icon-path');
+  const addCustomIconBtn = document.getElementById('add-custom-icon-btn');
   
   const customBgInput = document.getElementById('custom-bg-input');
   const localBgTriggerBtn = document.getElementById('local-bg-trigger-btn');
@@ -180,6 +186,89 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
       localBgFilename.textContent = 'Файл не выбран';
     }
+
+    buildCustomIconsListUI();
+  }
+
+  function buildCustomIconsListUI() {
+    if (!customIconsList) return;
+    customIconsList.replaceChildren();
+
+    const icons = settings.customIcons || [];
+    if (icons.length === 0) {
+      const emptyMsg = document.createElement('div');
+      emptyMsg.className = 'help-text';
+      emptyMsg.style.textAlign = 'center';
+      emptyMsg.style.padding = '0.5rem 0';
+      emptyMsg.textContent = 'Нет кастомных иконок';
+      customIconsList.appendChild(emptyMsg);
+      return;
+    }
+
+    icons.forEach((item, index) => {
+      const el = document.createElement('div');
+      el.className = 'custom-icon-item';
+
+      const info = document.createElement('div');
+      info.className = 'custom-icon-info';
+
+      const pattern = document.createElement('div');
+      pattern.className = 'custom-icon-pattern';
+      pattern.textContent = item.pattern;
+      pattern.title = item.pattern;
+
+      const path = document.createElement('div');
+      path.className = 'custom-icon-path';
+      path.textContent = item.iconUrl;
+      path.title = item.iconUrl;
+
+      info.appendChild(pattern);
+      info.appendChild(path);
+
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'custom-icon-delete';
+      deleteBtn.setAttribute('aria-label', 'Удалить правило');
+      deleteBtn.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+
+      deleteBtn.addEventListener('click', async () => {
+        const updatedIcons = [...settings.customIcons];
+        updatedIcons.splice(index, 1);
+        await saveSettings({ customIcons: updatedIcons });
+        buildCustomIconsListUI();
+        renderBookmarksTree();
+      });
+
+      el.appendChild(info);
+      el.appendChild(deleteBtn);
+      customIconsList.appendChild(el);
+    });
+  }
+
+  function getCustomIcon(url) {
+    if (!settings.customIcons || !Array.isArray(settings.customIcons)) return null;
+    const lowerUrl = url.toLowerCase();
+    let domain = '';
+    try {
+      domain = new URL(url).hostname.toLowerCase().replace(/^www\./i, '');
+    } catch (e) {}
+
+    // Filter matching rules
+    const matchingRules = settings.customIcons.filter(rule => {
+      const pat = (rule.pattern || '').toLowerCase().trim();
+      if (!pat) return false;
+      // If pattern has protocol or slash, treat as substring/full URL match
+      if (pat.includes('://') || pat.includes('/')) {
+        return lowerUrl.includes(pat);
+      }
+      return domain === pat || domain.endsWith('.' + pat);
+    });
+
+    if (matchingRules.length > 0) {
+      // Prioritize by pattern length (most specific first)
+      matchingRules.sort((a, b) => b.pattern.length - a.pattern.length);
+      return matchingRules[0].iconUrl;
+    }
+    return null;
   }
 
   // ------------------------------------------------------------------------
@@ -470,17 +559,19 @@ document.addEventListener('DOMContentLoaded', () => {
     iconWrapper.className = 'app-icon-wrapper';
 
     // Google high-resolution favicon cache with smart fallback & overrides
-    const favUrl = getFaviconUrl(bookmark.url);
+    const customIconUrl = getCustomIcon(bookmark.url);
+    const favUrl = customIconUrl || getFaviconUrl(bookmark.url);
     const img = document.createElement('img');
     img.src = favUrl;
     img.alt = '';
     
     // Programmatic fallback chain:
+    // Tier 0: Custom Icon (if configured and failed, falls back to standard favicon url)
     // Tier 1: gstatic branding SVG (for Google subdomains)
     // Tier 2: standard Google faviconV2 (origin-based)
     // Tier 3: Direct root /favicon.ico request (highly robust fallback for local/intranet sites)
     // Tier 4: Dynamic letter-gradient avatar fallback
-    let currentTier = 1;
+    let currentTier = customIconUrl ? 0 : 1;
     
     img.onerror = () => {
       // Extract origin for direct requests
@@ -491,8 +582,15 @@ document.addEventListener('DOMContentLoaded', () => {
         origin = '';
       }
 
+      // If Tier 0 (custom icon) failed, fallback to standard favicon URL (Tier 1)
+      if (currentTier === 0) {
+        currentTier = 1;
+        img.src = getFaviconUrl(bookmark.url);
+        return;
+      }
+
       // If we initially tried to load from gstatic branding SVG and it failed, fall back to Google faviconV2
-      if (currentTier === 1 && favUrl.includes('gstatic.com/images/branding/productlogos/')) {
+      if (currentTier === 1 && img.src.includes('gstatic.com/images/branding/productlogos/')) {
         currentTier = 2;
         if (origin) {
           img.src = `https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${encodeURIComponent(origin)}&size=64`;
@@ -664,6 +762,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
     glowEffectToggle.addEventListener('change', (e) => {
       saveSettings({ glowEffect: e.target.checked });
+    });
+
+    // Custom Icon adding
+    addCustomIconBtn.addEventListener('click', async () => {
+      const pattern = customIconPattern.value.trim();
+      const path = customIconPath.value.trim();
+
+      if (!pattern || !path) {
+        alert('Пожалуйста, заполните оба поля: домен/URL и путь к иконке.');
+        return;
+      }
+
+      const updatedIcons = Array.isArray(settings.customIcons) ? [...settings.customIcons] : [];
+      
+      const existingIndex = updatedIcons.findIndex(item => item.pattern.toLowerCase() === pattern.toLowerCase());
+      if (existingIndex > -1) {
+        updatedIcons[existingIndex].iconUrl = path;
+      } else {
+        updatedIcons.push({ pattern, iconUrl: path });
+      }
+
+      await saveSettings({ customIcons: updatedIcons });
+      
+      customIconPattern.value = '';
+      customIconPath.value = '';
+      
+      buildCustomIconsListUI();
+      renderBookmarksTree();
     });
 
     // Web link wallpaper
