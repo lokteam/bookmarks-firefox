@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4f46e5" />
+      <stop offset="100%" stop-color="#06b6d4" />
+    </linearGradient>
+    
+    <!-- Bookmark Gradient -->
+    <linearGradient id="bookmarkGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#e2e8f0" />
+    </linearGradient>
+
+    <!-- Drop Shadow Filter for bookmark ribbon -->
+    <filter id="shadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#0f172a" flood-opacity="0.25" />
+    </filter>
+  </defs>
+
+  <!-- Background Base -->
+  <rect x="8" y="8" width="112" height="112" rx="28" fill="url(#bgGrad)" />
+
+  <!-- Subtle Glowing Core -->
+  <circle cx="64" cy="64" r="36" fill="#ffffff" opacity="0.1" filter="blur(8px)" />
+
+  <!-- Stylized Bookmark Shape -->
+  <path d="M44,32 L84,32 C88.4,32 92,35.6 92,40 L92,96 L64,80 L36,96 L36,40 C36,35.6 39.6,32 44,32 Z" 
+        fill="url(#bookmarkGrad)" 
+        filter="url(#shadow)" />
+
+  <!-- Sparkle/Dot detail -->
+  <circle cx="64" cy="50" r="4" fill="#06b6d4" />
+  <path d="M54,64 L74,64 M64,54 L64,74" stroke="#4f46e5" stroke-width="3" stroke-linecap="round" opacity="0.3" />
+</svg>

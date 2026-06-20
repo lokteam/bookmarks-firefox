@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "LokBookmarks",
+  "version": "1.0.0",
+  "description": "Заменяет новую вкладку на красивую, настраиваемую и функциональную страницу с вашими закладками.",
+  "icons": {
+    "32": "icon.svg",
+    "64": "icon.svg",
+    "128": "icon.svg"
+  },
+  "permissions": [
+    "bookmarks",
+    "storage"
+  ],
+  "chrome_url_overrides": {
+    "newtab": "newtab.html"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "lokbookmarks@earendil.works",
+      "strict_min_version": "142.0",
+      "data_collection_permissions": {
+        "required": ["none"]
+      }
+    }
+  }
+}
