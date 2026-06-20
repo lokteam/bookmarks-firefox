@@ -356,7 +356,7 @@ document.addEventListener('DOMContentLoaded', () => {
       showEmptyState();
     } else {
       emptyState.style.display = 'none';
-      bookmarksWorkspace.style.display = 'flex';
+      bookmarksWorkspace.style.display = '';
     }
   }
 
@@ -498,7 +498,7 @@ document.addEventListener('DOMContentLoaded', () => {
       document.querySelectorAll('.folder-card').forEach(el => el.style.display = 'flex');
       document.querySelectorAll('.app-tile').forEach(el => el.style.display = 'flex');
       emptyState.style.display = 'none';
-      bookmarksWorkspace.style.display = 'flex';
+      bookmarksWorkspace.style.display = '';
       return;
     }
 
@@ -549,7 +549,7 @@ document.addEventListener('DOMContentLoaded', () => {
       bookmarksWorkspace.style.display = 'none';
       emptyState.style.display = 'flex';
     } else {
-      bookmarksWorkspace.style.display = 'flex';
+      bookmarksWorkspace.style.display = '';
       emptyState.style.display = 'none';
     }
   }
