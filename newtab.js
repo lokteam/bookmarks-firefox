@@ -12,7 +12,9 @@ document.addEventListener('DOMContentLoaded', () => {
     customTheme: 'minimal',  // 'minimal', 'catppuccin', 'onedark', 'tokyonight', 'nord', 'gruvbox', 'dracula', 'cyberpunk'
     glowEffect: true,
     folderColumns: 4,
-    bgCustomUrl: ''
+    bgCustomUrl: '',
+    bgOpacity: 75,
+    bgBlur: 0
   };
 
   let settings = { ...DEFAULTS };
@@ -45,6 +47,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const localBgInput = document.getElementById('local-bg-input');
   const localBgFilename = document.getElementById('local-bg-filename');
   const clearBgBtn = document.getElementById('clear-bg-btn');
+
+  const bgOpacityInput = document.getElementById('bg-opacity-input');
+  const bgOpacityVal = document.getElementById('bg-opacity-val');
+  const bgBlurInput = document.getElementById('bg-blur-input');
+  const bgBlurVal = document.getElementById('bg-blur-val');
+  const bgOpacitySettings = document.getElementById('bg-opacity-settings');
+  const bgBlurSettings = document.getElementById('bg-blur-settings');
 
   // Sidebar dim overlay
   const sidebarOverlay = document.querySelector('.settings-sidebar-open-overlay') || (() => {
@@ -98,6 +107,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Dynamic Columns CSS variable
     document.documentElement.style.setProperty('--folder-columns', settings.folderColumns || 4);
 
+    // Dynamic background opacity and blur CSS variables
+    const bgOpacity = settings.bgOpacity !== undefined ? settings.bgOpacity : 75;
+    const bgBlur = settings.bgBlur !== undefined ? settings.bgBlur : 0;
+    document.documentElement.style.setProperty('--bg-overlay-opacity', bgOpacity / 100);
+    document.documentElement.style.setProperty('--bg-blur', `${bgBlur}px`);
+
     // Apply Wallpaper (Local Base64 has priority, then URL text, then default space background)
     let wallpaperLayer = document.querySelector('.bg-wallpaper');
     if (!wallpaperLayer) {
@@ -138,6 +153,25 @@ document.addEventListener('DOMContentLoaded', () => {
     folderColumnsSelect.value = settings.folderColumns || 4;
     glowEffectToggle.checked = settings.glowEffect;
     customBgInput.value = settings.bgCustomUrl || '';
+
+    // Show / hide background opacity & blur settings based on wallpaper presence
+    const hasWallpaper = !!(localWallpaperBase64 || settings.bgCustomUrl);
+    if (hasWallpaper) {
+      bgOpacitySettings.style.display = 'block';
+      bgBlurSettings.style.display = 'block';
+    } else {
+      bgOpacitySettings.style.display = 'none';
+      bgBlurSettings.style.display = 'none';
+    }
+
+    const currentOpacity = settings.bgOpacity !== undefined ? settings.bgOpacity : 75;
+    const currentBlur = settings.bgBlur !== undefined ? settings.bgBlur : 0;
+
+    bgOpacityInput.value = currentOpacity;
+    bgOpacityVal.textContent = `${currentOpacity}%`;
+
+    bgBlurInput.value = currentBlur;
+    bgBlurVal.textContent = `${currentBlur}px`;
 
     // File upload label update
     if (localWallpaperBase64) {
@@ -581,7 +615,8 @@ document.addEventListener('DOMContentLoaded', () => {
       localWallpaperBase64 = '';
       localBgFilename.textContent = 'Файл не выбран';
       await browser.storage.local.remove('localWallpaperBase64');
-      saveSettings({ bgCustomUrl: url });
+      await saveSettings({ bgCustomUrl: url });
+      buildSettingsPanel();
     });
 
     // Local file wallpaper trigger
@@ -606,7 +641,8 @@ document.addEventListener('DOMContentLoaded', () => {
           // Clear web URL to avoid conflict
           customBgInput.value = '';
           localBgFilename.textContent = file.name;
-          saveSettings({ bgCustomUrl: '' });
+          await saveSettings({ bgCustomUrl: '' });
+          buildSettingsPanel();
         } catch (err) {
           console.error('Failed to save uploaded image:', err);
           alert('Ошибка при сохранении файла. Пожалуйста, попробуйте картинку меньшего размера (рекомендуется сжатый JPG/PNG).');
@@ -616,6 +652,30 @@ document.addEventListener('DOMContentLoaded', () => {
       reader.readAsDataURL(file);
     });
 
+    // Opacity slider live updates
+    bgOpacityInput.addEventListener('input', (e) => {
+      const val = parseInt(e.target.value, 10);
+      bgOpacityVal.textContent = `${val}%`;
+      document.documentElement.style.setProperty('--bg-overlay-opacity', val / 100);
+    });
+
+    bgOpacityInput.addEventListener('change', (e) => {
+      const val = parseInt(e.target.value, 10);
+      saveSettings({ bgOpacity: val });
+    });
+
+    // Blur slider live updates
+    bgBlurInput.addEventListener('input', (e) => {
+      const val = parseInt(e.target.value, 10);
+      bgBlurVal.textContent = `${val}px`;
+      document.documentElement.style.setProperty('--bg-blur', `${val}px`);
+    });
+
+    bgBlurInput.addEventListener('change', (e) => {
+      const val = parseInt(e.target.value, 10);
+      saveSettings({ bgBlur: val });
+    });
+
     // Delete wallpapers completely
     clearBgBtn.addEventListener('click', async () => {
       localWallpaperBase64 = '';
@@ -623,7 +683,8 @@ document.addEventListener('DOMContentLoaded', () => {
       localBgInput.value = '';
       customBgInput.value = '';
       await browser.storage.local.remove('localWallpaperBase64');
-      saveSettings({ bgCustomUrl: '' });
+      await saveSettings({ bgCustomUrl: '' });
+      buildSettingsPanel();
     });
 
     // Reset settings button

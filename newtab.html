@@ -134,6 +134,27 @@
             <span id="local-bg-filename" class="help-text">Файл не выбран</span>
           </div>
         </div>
+
+        <div class="setting-item" id="bg-opacity-settings" style="margin-top: 0.4rem; display: none;">
+          <div class="range-control">
+            <div class="range-label-wrapper">
+              <span class="range-label">Затемнение / Засветление:</span>
+              <span id="bg-opacity-val" class="range-val">75%</span>
+            </div>
+            <input type="range" id="bg-opacity-input" min="0" max="100" value="75">
+          </div>
+        </div>
+
+        <div class="setting-item" id="bg-blur-settings" style="margin-top: 0.4rem; display: none;">
+          <div class="range-control">
+            <div class="range-label-wrapper">
+              <span class="range-label">Размытие фона (блюр):</span>
+              <span id="bg-blur-val" class="range-val">0px</span>
+            </div>
+            <input type="range" id="bg-blur-input" min="0" max="25" value="0">
+          </div>
+        </div>
+
         <button class="btn btn-secondary" id="clear-bg-btn" style="margin-top: 0.2rem;">Удалить фоновые обои</button>
       </div>
 
