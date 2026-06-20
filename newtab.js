@@ -430,74 +430,26 @@ document.addEventListener('DOMContentLoaded', () => {
     return card;
   }
 
-  // Helper to fetch high-resolution favicon, bypassing slow 301 redirects and resolving subpaths/subdomains correctly
+  // Get high-resolution favicon by extracting the base origin to avoid subpath resolution issues
   function getFaviconUrl(url) {
     try {
       const parsed = new URL(url);
-      const hostname = parsed.hostname.toLowerCase();
-
-      // Special high-resolution overrides for Google products
-      if (hostname.includes('tasks.google.com')) {
-        return 'https://www.gstatic.com/images/branding/product/1x/tasks_64dp.png';
-      }
-      if (hostname.includes('mail.google.com') || hostname === 'gmail.com') {
-        return 'https://www.gstatic.com/images/branding/product/1x/gmail_64dp.png';
-      }
-      if (hostname.includes('calendar.google.com')) {
-        return 'https://www.gstatic.com/images/branding/product/1x/calendar_2020q4_64dp.png';
-      }
-      if (hostname.includes('keep.google.com') || hostname === 'keep.google') {
-        return 'https://www.gstatic.com/images/branding/product/1x/keep_2020q4_64dp.png';
-      }
-      if (hostname.includes('docs.google.com')) {
-        const path = parsed.pathname;
-        if (path.includes('/document/')) {
-          return 'https://www.gstatic.com/images/branding/product/1x/docs_2020q4_64dp.png';
-        }
-        if (path.includes('/spreadsheets/')) {
-          return 'https://www.gstatic.com/images/branding/product/1x/sheets_2020q4_64dp.png';
-        }
-        if (path.includes('/presentation/')) {
-          return 'https://www.gstatic.com/images/branding/product/1x/slides_2020q4_64dp.png';
-        }
-        if (path.includes('/forms/')) {
-          return 'https://www.gstatic.com/images/branding/product/1x/forms_2020q4_64dp.png';
-        }
-        return 'https://www.gstatic.com/images/branding/product/1x/docs_2020q4_64dp.png';
-      }
-      if (hostname.includes('drive.google.com')) {
-        return 'https://www.gstatic.com/images/branding/product/1x/drive_2020q4_64dp.png';
-      }
-      if (hostname.includes('meet.google.com')) {
-        return 'https://www.gstatic.com/images/branding/product/1x/meet_2020q4_64dp.png';
-      }
-      if (hostname.includes('chat.google.com')) {
-        return 'https://www.gstatic.com/images/branding/product/1x/chat_2020q4_64dp.png';
-      }
-      if (hostname.includes('photos.google.com')) {
-        return 'https://www.gstatic.com/images/branding/product/1x/photos_64dp.png';
-      }
-      if (hostname.includes('contacts.google.com')) {
-        return 'https://www.gstatic.com/images/branding/product/1x/contacts_64dp.png';
-      }
-      if (hostname.includes('youtube.com') || hostname === 'youtu.be') {
-        return 'https://www.gstatic.com/images/branding/product/1x/youtube_64dp.png';
-      }
-      if (hostname.includes('maps.google.com') || hostname.includes('google.com/maps')) {
-        return 'https://www.gstatic.com/images/branding/product/1x/maps_64dp.png';
-      }
-      if (hostname.includes('translate.google.com')) {
-        return 'https://www.gstatic.com/images/branding/product/1x/translate_64dp.png';
-      }
-
-      // Bypass slow legacy google favicon api redirect (301) by directly hitting faviconV2.
-      // We target the root origin (protocol + domain) instead of the full URL with subpaths
-      // because subpaths often fail to resolve in high-res and trigger 32x32 generic fallbacks.
-      const origin = parsed.origin;
-      return `https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${encodeURIComponent(origin)}&size=64`;
+      // We directly target the root origin (protocol + host) instead of the full URL with subpaths
+      // because subpaths often fail to resolve in high-res and trigger generic 32x32 fallbacks on Google's backend.
+      // Also, we query faviconV2 directly to bypass slow legacy 301 network redirects.
+      return `https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${encodeURIComponent(parsed.origin)}&size=64`;
     } catch (e) {
-      // Robust absolute fallback for invalid URLs
       return `https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${encodeURIComponent(url)}&size=64`;
+    }
+  }
+
+  // Fallback to DuckDuckGo's favicon API which parses target HTML and resolves subdomains/subpaths dynamically
+  function getDuckDuckGoFaviconUrl(url) {
+    try {
+      const parsed = new URL(url);
+      return `https://icons.duckduckgo.com/ip3/${parsed.hostname}.ico`;
+    } catch (e) {
+      return '';
     }
   }
 
@@ -517,17 +469,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Google high-resolution favicon cache with smart fallback & overrides
     const favUrl = getFaviconUrl(bookmark.url);
+    const ddgFavUrl = getDuckDuckGoFaviconUrl(bookmark.url);
     const img = document.createElement('img');
     img.src = favUrl;
     img.alt = '';
     
-    // Fallback in case of network block or offline state
+    // Fallback chain in case of network block, offline state, or loading error
+    let usingFallback = false;
     img.onerror = () => {
-      const fallback = document.createElement('div');
-      fallback.className = 'app-fallback-icon';
-      fallback.style.background = getGradientForString(bookmark.domain || bookmark.title || 'app');
-      fallback.textContent = (bookmark.title || bookmark.domain || 'A').trim().charAt(0).toUpperCase();
-      img.replaceWith(fallback);
+      if (!usingFallback && ddgFavUrl) {
+        usingFallback = true;
+        img.src = ddgFavUrl;
+      } else {
+        const fallback = document.createElement('div');
+        fallback.className = 'app-fallback-icon';
+        fallback.style.background = getGradientForString(bookmark.domain || bookmark.title || 'app');
+        fallback.textContent = (bookmark.title || bookmark.domain || 'A').trim().charAt(0).toUpperCase();
+        img.replaceWith(fallback);
+      }
     };
 
     iconWrapper.appendChild(img);
