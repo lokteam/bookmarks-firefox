@@ -4,35 +4,24 @@
 
 document.addEventListener('DOMContentLoaded', () => {
   // ------------------------------------------------------------------------
-  // 1. CONSTANTS & NEON COLOR PRESETS
+  // 1. CONSTANTS & THEME LIST
   // ------------------------------------------------------------------------
   
   const DEFAULTS = {
-    theme: 'dark',
+    theme: 'dark',          // 'dark' or 'light'
+    customTheme: 'minimal',  // 'minimal', 'catppuccin', 'onedark', 'tokyonight', 'nord', 'gruvbox', 'dracula', 'cyberpunk'
     glowEffect: true,
     folderColumns: 4,
-    glowPresetIndex: 0,
     bgCustomUrl: ''
   };
 
   let settings = { ...DEFAULTS };
   let bookmarkTreeRoot = null; // Compiled clean recursive folder tree
-  
-  // Neon Accents Presets (Two-color combinations for abstract background blobs)
-  const GLOW_PRESETS = [
-    { name: 'Киберпанк', color1: '#6366f1', color2: '#06b6d4' }, // Indigo + Cyan
-    { name: 'Пинки', color1: '#ec4899', color2: '#8b5cf6' },      // Pink + Violet
-    { name: 'Изумруд', color1: '#10b981', color2: '#0284c7' },     // Emerald + Sky
-    { name: 'Вулкан', color1: '#f97316', color2: '#ef4444' },      // Orange + Red
-    { name: 'Золото', color1: '#eab308', color2: '#d97706' }       // Yellow + Amber
-  ];
+  let localWallpaperBase64 = ''; // Base64 stored uploaded background image
 
   // ------------------------------------------------------------------------
   // 2. DOM ELEMENTS
   // ------------------------------------------------------------------------
-  
-  const blob1 = document.getElementById('blob-1');
-  const blob2 = document.getElementById('blob-2');
   
   const searchInput = document.getElementById('search-input');
   const searchClearBtn = document.getElementById('search-clear-btn');
@@ -47,10 +36,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const resetSettingsBtn = document.getElementById('reset-settings-btn');
   
   const themeSegmentBtns = document.querySelectorAll('[data-theme]');
+  const customThemeSelect = document.getElementById('custom-theme-select');
   const folderColumnsSelect = document.getElementById('folder-columns-select');
   const glowEffectToggle = document.getElementById('glow-effect-toggle');
-  const bgOptionsGrid = document.getElementById('bg-options-grid');
+  
   const customBgInput = document.getElementById('custom-bg-input');
+  const localBgTriggerBtn = document.getElementById('local-bg-trigger-btn');
+  const localBgInput = document.getElementById('local-bg-input');
+  const localBgFilename = document.getElementById('local-bg-filename');
+  const clearBgBtn = document.getElementById('clear-bg-btn');
 
   // Sidebar dim overlay
   const sidebarOverlay = document.querySelector('.settings-sidebar-open-overlay') || (() => {
@@ -66,12 +60,19 @@ document.addEventListener('DOMContentLoaded', () => {
   
   async function init() {
     try {
+      // 1. Load basic launcher settings
       const stored = await browser.storage.local.get('launcherSettings');
       if (stored && stored.launcherSettings) {
         settings = { ...DEFAULTS, ...stored.launcherSettings };
       }
+
+      // 2. Load uploaded local background if available
+      const wpStored = await browser.storage.local.get('localWallpaperBase64');
+      if (wpStored && wpStored.localWallpaperBase64) {
+        localWallpaperBase64 = wpStored.localWallpaperBase64;
+      }
     } catch (e) {
-      console.warn('Could not read launcher settings, using defaults:', e);
+      console.warn('Could not read stored data, using defaults:', e);
     }
 
     applySettingsToUI();
@@ -82,9 +83,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function applySettingsToUI() {
-    // Theme CSS class
+    // Apply theme classes to body (e.g. class="theme-dark theme-catppuccin")
     document.body.className = '';
     document.body.classList.add(`theme-${settings.theme}`);
+    document.body.classList.add(`theme-${settings.customTheme || 'minimal'}`);
 
     // Neon Glow Blobs switch
     if (settings.glowEffect) {
@@ -96,13 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Dynamic Columns CSS variable
     document.documentElement.style.setProperty('--folder-columns', settings.folderColumns || 4);
 
-    // Apply Neon Colors to CSS Variables
-    const glowPreset = GLOW_PRESETS[settings.glowPresetIndex] || GLOW_PRESETS[0];
-    document.documentElement.style.setProperty('--accent-color-1', glowPreset.color1);
-    document.documentElement.style.setProperty('--accent-color-2', glowPreset.color2);
-    document.documentElement.style.setProperty('--accent-glow', `${glowPreset.color1}22`); // Hex with 13% opacity
-
-    // Apply Custom Background Wallpaper if provided
+    // Apply Wallpaper (Local Base64 has priority, then URL text, then default space background)
     let wallpaperLayer = document.querySelector('.bg-wallpaper');
     if (!wallpaperLayer) {
       wallpaperLayer = document.createElement('div');
@@ -110,7 +106,10 @@ document.addEventListener('DOMContentLoaded', () => {
       document.body.prepend(wallpaperLayer);
     }
 
-    if (settings.bgCustomUrl) {
+    if (localWallpaperBase64) {
+      wallpaperLayer.style.backgroundImage = `url("${localWallpaperBase64}")`;
+      document.body.classList.add('has-wallpaper');
+    } else if (settings.bgCustomUrl) {
       wallpaperLayer.style.backgroundImage = `url("${settings.bgCustomUrl}")`;
       document.body.classList.add('has-wallpaper');
     } else {
@@ -130,36 +129,22 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function buildSettingsPanel() {
-    // Theme Segment buttons
+    // Dark/Light segments state
     themeSegmentBtns.forEach(btn => {
       btn.classList.toggle('active', btn.getAttribute('data-theme') === settings.theme);
     });
 
+    customThemeSelect.value = settings.customTheme || 'minimal';
     folderColumnsSelect.value = settings.folderColumns || 4;
     glowEffectToggle.checked = settings.glowEffect;
     customBgInput.value = settings.bgCustomUrl || '';
 
-    // Load Glow Presets Swatches
-    bgOptionsGrid.replaceChildren();
-    GLOW_PRESETS.forEach((preset, index) => {
-      const swatch = document.createElement('button');
-      swatch.type = 'button';
-      swatch.className = 'bg-swatch';
-      swatch.style.background = `linear-gradient(135deg, ${preset.color1} 0%, ${preset.color2} 100%)`;
-      swatch.title = preset.name;
-      
-      if (settings.glowPresetIndex === index) {
-        swatch.classList.add('active');
-      }
-
-      swatch.addEventListener('click', () => {
-        document.querySelectorAll('.bg-swatch').forEach(s => s.classList.remove('active'));
-        swatch.classList.add('active');
-        saveSettings({ glowPresetIndex: index });
-      });
-
-      bgOptionsGrid.appendChild(swatch);
-    });
+    // File upload label update
+    if (localWallpaperBase64) {
+      localBgFilename.textContent = 'Изображение загружено';
+    } else {
+      localBgFilename.textContent = 'Файл не выбран';
+    }
   }
 
   // ------------------------------------------------------------------------
@@ -458,7 +443,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     const h1 = Math.abs(hash % 360);
     const h2 = (h1 + 45) % 360;
-    return `linear-gradient(135deg, hsl(${h1}, 80%, 52%) 0%, hsl(${h2}, 85%, 42%) 100%)`;
+    return `linear-gradient(135deg, hsl(${h1}, 75%, 52%) 0%, hsl(${h2}, 80%, 42%) 100%)`;
   }
 
   function showEmptyState() {
@@ -577,6 +562,10 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
+    customThemeSelect.addEventListener('change', (e) => {
+      saveSettings({ customTheme: e.target.value });
+    });
+
     folderColumnsSelect.addEventListener('change', (e) => {
       saveSettings({ folderColumns: parseInt(e.target.value, 10) });
     });
@@ -585,12 +574,65 @@ document.addEventListener('DOMContentLoaded', () => {
       saveSettings({ glowEffect: e.target.checked });
     });
 
-    customBgInput.addEventListener('change', (e) => {
-      saveSettings({ bgCustomUrl: e.target.value.trim() });
+    // Web link wallpaper
+    customBgInput.addEventListener('change', async (e) => {
+      const url = e.target.value.trim();
+      // If a web URL is written, clear local image wallpaper to avoid overlap
+      localWallpaperBase64 = '';
+      localBgFilename.textContent = 'Файл не выбран';
+      await browser.storage.local.remove('localWallpaperBase64');
+      saveSettings({ bgCustomUrl: url });
     });
 
+    // Local file wallpaper trigger
+    localBgTriggerBtn.addEventListener('click', () => {
+      localBgInput.click();
+    });
+
+    // Local file wallpaper selected
+    localBgInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      localBgFilename.textContent = 'Загрузка...';
+
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        const base64 = event.target.result;
+        try {
+          localWallpaperBase64 = base64;
+          await browser.storage.local.set({ localWallpaperBase64: base64 });
+          
+          // Clear web URL to avoid conflict
+          customBgInput.value = '';
+          localBgFilename.textContent = file.name;
+          saveSettings({ bgCustomUrl: '' });
+        } catch (err) {
+          console.error('Failed to save uploaded image:', err);
+          alert('Ошибка при сохранении файла. Пожалуйста, попробуйте картинку меньшего размера (рекомендуется сжатый JPG/PNG).');
+          localBgFilename.textContent = 'Ошибка загрузки';
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Delete wallpapers completely
+    clearBgBtn.addEventListener('click', async () => {
+      localWallpaperBase64 = '';
+      localBgFilename.textContent = 'Файл не выбран';
+      localBgInput.value = '';
+      customBgInput.value = '';
+      await browser.storage.local.remove('localWallpaperBase64');
+      saveSettings({ bgCustomUrl: '' });
+    });
+
+    // Reset settings button
     resetSettingsBtn.addEventListener('click', async () => {
       if (confirm('Сбросить параметры лончера к стандартным?')) {
+        localWallpaperBase64 = '';
+        localBgFilename.textContent = 'Файл не выбран';
+        localBgInput.value = '';
+        await browser.storage.local.remove('localWallpaperBase64');
         await saveSettings(DEFAULTS);
         buildSettingsPanel();
         closeSidebar();

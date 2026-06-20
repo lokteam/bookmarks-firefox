@@ -4,12 +4,6 @@
 
 /* 1. Global Reset & CSS Variables */
 :root {
-  /* Default Neon Accents */
-  --accent-color-1: #6366f1;
-  --accent-color-2: #06b6d4;
-  --accent-glow: rgba(99, 102, 241, 0.15);
-  --accent-gradient: linear-gradient(135deg, var(--accent-color-1) 0%, var(--accent-color-2) 100%);
-  
   /* Font Family */
   --font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   
@@ -18,16 +12,6 @@
   --transition-fast: 0.15s cubic-bezier(0.25, 0.8, 0.25, 1);
   --transition-bg: background 0.8s ease, filter 0.8s ease;
 
-  /* Theme Defaults (Dark Space theme by default) */
-  --bg-color: #030307;
-  --text-main: #f3f4f6;
-  --text-muted: #9ca3af;
-  --bg-card: rgba(14, 14, 24, 0.45);
-  --border-card: rgba(255, 255, 255, 0.05);
-  --border-hover: rgba(255, 255, 255, 0.12);
-  --shadow-main: 0 10px 40px rgba(0, 0, 0, 0.25);
-  --blur-amount: 24px;
-  
   /* Layout Dimensions */
   --folder-columns: 4;
   --app-tile-width: 72px;
@@ -36,16 +20,260 @@
   --grid-gap: 1.1rem;
 }
 
-/* Light theme overrides */
-.theme-light {
-  --bg-color: #f3f4f6;
+/* ------------------------------------------------------------------------
+   THEME 1: MINIMAL (Default scale, silver glows)
+   ------------------------------------------------------------------------ */
+.theme-minimal.theme-dark {
+  --bg-color: #050508;
+  --text-main: #f3f4f6;
+  --text-muted: #6b7280;
+  --bg-card: rgba(18, 18, 26, 0.45);
+  --border-card: rgba(255, 255, 255, 0.05);
+  --border-hover: rgba(255, 255, 255, 0.15);
+  --shadow-main: 0 10px 40px rgba(0, 0, 0, 0.25);
+  --blur-amount: 24px;
+  --accent-color-1: #ffffff;
+  --accent-color-2: #9ca3af;
+  --accent-glow: rgba(255, 255, 255, 0.15);
+  --accent-gradient: linear-gradient(135deg, var(--accent-color-1) 0%, var(--accent-color-2) 100%);
+}
+.theme-minimal.theme-light {
+  --bg-color: #ffffff;
   --text-main: #111827;
   --text-muted: #6b7280;
-  --bg-card: rgba(255, 255, 255, 0.5);
-  --border-card: rgba(17, 24, 39, 0.06);
-  --border-hover: rgba(17, 24, 39, 0.15);
+  --bg-card: rgba(243, 244, 246, 0.6);
+  --border-card: rgba(17, 24, 39, 0.08);
+  --border-hover: rgba(17, 24, 39, 0.2);
   --shadow-main: 0 10px 40px rgba(17, 24, 39, 0.04);
   --blur-amount: 20px;
+  --accent-color-1: #111827;
+  --accent-color-2: #4b5563;
+  --accent-glow: rgba(17, 24, 39, 0.1);
+  --accent-gradient: linear-gradient(135deg, var(--accent-color-1) 0%, var(--accent-color-2) 100%);
+}
+
+/* ------------------------------------------------------------------------
+   THEME 2: CATPPUCCIN (Macchiato / Latte)
+   ------------------------------------------------------------------------ */
+.theme-catppuccin.theme-dark {
+  --bg-color: #24273a;
+  --text-main: #cad3f5;
+  --text-muted: #8087a2;
+  --bg-card: rgba(30, 32, 48, 0.45);
+  --border-card: rgba(138, 173, 244, 0.08);
+  --border-hover: rgba(138, 173, 244, 0.25);
+  --shadow-main: 0 10px 40px rgba(0, 0, 0, 0.25);
+  --blur-amount: 24px;
+  --accent-color-1: #8aadf4;
+  --accent-color-2: #f5bde6;
+  --accent-glow: rgba(138, 173, 244, 0.18);
+  --accent-gradient: linear-gradient(135deg, var(--accent-color-1) 0%, var(--accent-color-2) 100%);
+}
+.theme-catppuccin.theme-light {
+  --bg-color: #eff1f5;
+  --text-main: #4c4f69;
+  --text-muted: #7c7f93;
+  --bg-card: rgba(228, 233, 237, 0.65);
+  --border-card: rgba(30, 32, 48, 0.07);
+  --border-hover: rgba(30, 32, 48, 0.18);
+  --shadow-main: 0 10px 40px rgba(30, 32, 48, 0.04);
+  --blur-amount: 20px;
+  --accent-color-1: #1e66f5;
+  --accent-color-2: #ea76cb;
+  --accent-glow: rgba(30, 32, 48, 0.1);
+  --accent-gradient: linear-gradient(135deg, var(--accent-color-1) 0%, var(--accent-color-2) 100%);
+}
+
+/* ------------------------------------------------------------------------
+   THEME 3: ONE DARK (VS Code Style)
+   ------------------------------------------------------------------------ */
+.theme-onedark.theme-dark {
+  --bg-color: #1e222a;
+  --text-main: #abb2bf;
+  --text-muted: #5c6370;
+  --bg-card: rgba(33, 37, 43, 0.5);
+  --border-card: rgba(255, 255, 255, 0.05);
+  --border-hover: rgba(97, 175, 239, 0.25);
+  --shadow-main: 0 10px 40px rgba(0, 0, 0, 0.25);
+  --blur-amount: 24px;
+  --accent-color-1: #61afef;
+  --accent-color-2: #c678dd;
+  --accent-glow: rgba(97, 175, 239, 0.18);
+  --accent-gradient: linear-gradient(135deg, var(--accent-color-1) 0%, var(--accent-color-2) 100%);
+}
+.theme-onedark.theme-light {
+  --bg-color: #f9f9f9;
+  --text-main: #383a42;
+  --text-muted: #a0a1a7;
+  --bg-card: rgba(240, 240, 240, 0.65);
+  --border-card: rgba(56, 58, 66, 0.08);
+  --border-hover: rgba(64, 120, 242, 0.2);
+  --shadow-main: 0 10px 40px rgba(56, 58, 66, 0.04);
+  --blur-amount: 20px;
+  --accent-color-1: #4078f2;
+  --accent-color-2: #a626a4;
+  --accent-glow: rgba(64, 120, 242, 0.12);
+  --accent-gradient: linear-gradient(135deg, var(--accent-color-1) 0%, var(--accent-color-2) 100%);
+}
+
+/* ------------------------------------------------------------------------
+   THEME 4: TOKYO NIGHT (Storm / Day)
+   ------------------------------------------------------------------------ */
+.theme-tokyonight.theme-dark {
+  --bg-color: #1a1b26;
+  --text-main: #a9b1d6;
+  --text-muted: #565f89;
+  --bg-card: rgba(22, 22, 30, 0.55);
+  --border-card: rgba(255, 255, 255, 0.04);
+  --border-hover: rgba(122, 162, 247, 0.25);
+  --shadow-main: 0 10px 40px rgba(0, 0, 0, 0.25);
+  --blur-amount: 24px;
+  --accent-color-1: #7aa2f7;
+  --accent-color-2: #bb9af3;
+  --accent-glow: rgba(122, 162, 247, 0.18);
+  --accent-gradient: linear-gradient(135deg, var(--accent-color-1) 0%, var(--accent-color-2) 100%);
+}
+.theme-tokyonight.theme-light {
+  --bg-color: #f5f6f9;
+  --text-main: #343b58;
+  --text-muted: #9198a6;
+  --bg-card: rgba(225, 227, 235, 0.6);
+  --border-card: rgba(52, 59, 88, 0.07);
+  --border-hover: rgba(52, 59, 88, 0.16);
+  --shadow-main: 0 10px 40px rgba(52, 59, 88, 0.04);
+  --blur-amount: 20px;
+  --accent-color-1: #3890f5;
+  --accent-color-2: #8c43f5;
+  --accent-glow: rgba(56, 144, 245, 0.12);
+  --accent-gradient: linear-gradient(135deg, var(--accent-color-1) 0%, var(--accent-color-2) 100%);
+}
+
+/* ------------------------------------------------------------------------
+   THEME 5: NORD (Nordic Frost)
+   ------------------------------------------------------------------------ */
+.theme-nord.theme-dark {
+  --bg-color: #2e3440;
+  --text-main: #d8dee9;
+  --text-muted: #4c566a;
+  --bg-card: rgba(36, 41, 51, 0.5);
+  --border-card: rgba(143, 188, 187, 0.08);
+  --border-hover: rgba(136, 192, 208, 0.28);
+  --shadow-main: 0 10px 40px rgba(0, 0, 0, 0.25);
+  --blur-amount: 24px;
+  --accent-color-1: #88c0d0;
+  --accent-color-2: #81a1c1;
+  --accent-glow: rgba(136, 192, 208, 0.18);
+  --accent-gradient: linear-gradient(135deg, var(--accent-color-1) 0%, var(--accent-color-2) 100%);
+}
+.theme-nord.theme-light {
+  --bg-color: #eceff4;
+  --text-main: #2e3440;
+  --text-muted: #4c566a;
+  --bg-card: rgba(216, 222, 233, 0.5);
+  --border-card: rgba(46, 52, 64, 0.06);
+  --border-hover: rgba(94, 129, 172, 0.2);
+  --shadow-main: 0 10px 40px rgba(46, 52, 64, 0.04);
+  --blur-amount: 20px;
+  --accent-color-1: #5e81ac;
+  --accent-color-2: #81a1c1;
+  --accent-glow: rgba(94, 129, 172, 0.12);
+  --accent-gradient: linear-gradient(135deg, var(--accent-color-1) 0%, var(--accent-color-2) 100%);
+}
+
+/* ------------------------------------------------------------------------
+   THEME 6: GRUVBOX (Retro Sand)
+   ------------------------------------------------------------------------ */
+.theme-gruvbox.theme-dark {
+  --bg-color: #1d2021;
+  --text-main: #fbf1c7;
+  --text-muted: #928374;
+  --bg-card: rgba(40, 40, 40, 0.5);
+  --border-card: rgba(251, 241, 199, 0.06);
+  --border-hover: rgba(250, 189, 47, 0.25);
+  --shadow-main: 0 10px 40px rgba(0, 0, 0, 0.25);
+  --blur-amount: 24px;
+  --accent-color-1: #fabd2f;
+  --accent-color-2: #fe8019;
+  --accent-glow: rgba(250, 189, 47, 0.18);
+  --accent-gradient: linear-gradient(135deg, var(--accent-color-1) 0%, var(--accent-color-2) 100%);
+}
+.theme-gruvbox.theme-light {
+  --bg-color: #fbf1c7;
+  --text-main: #282828;
+  --text-muted: #928374;
+  --bg-card: rgba(235, 219, 178, 0.6);
+  --border-card: rgba(40, 40, 40, 0.08);
+  --border-hover: rgba(181, 118, 20, 0.22);
+  --shadow-main: 0 10px 40px rgba(40, 40, 40, 0.04);
+  --blur-amount: 20px;
+  --accent-color-1: #b57614;
+  --accent-color-2: #af3a03;
+  --accent-glow: rgba(181, 118, 20, 0.12);
+  --accent-gradient: linear-gradient(135deg, var(--accent-color-1) 0%, var(--accent-color-2) 100%);
+}
+
+/* ------------------------------------------------------------------------
+   THEME 7: DRACULA (Vampire Glow)
+   ------------------------------------------------------------------------ */
+.theme-dracula.theme-dark {
+  --bg-color: #1e1f29;
+  --text-main: #f8f8f2;
+  --text-muted: #6272a4;
+  --bg-card: rgba(40, 42, 54, 0.45);
+  --border-card: rgba(255, 121, 198, 0.07);
+  --border-hover: rgba(255, 121, 198, 0.28);
+  --shadow-main: 0 10px 40px rgba(0, 0, 0, 0.25);
+  --blur-amount: 24px;
+  --accent-color-1: #ff79c6;
+  --accent-color-2: #bd93f9;
+  --accent-glow: rgba(255, 121, 198, 0.18);
+  --accent-gradient: linear-gradient(135deg, var(--accent-color-1) 0%, var(--accent-color-2) 100%);
+}
+.theme-dracula.theme-light {
+  --bg-color: #f8f8f2;
+  --text-main: #282a36;
+  --text-muted: #6272a4;
+  --bg-card: rgba(230, 230, 240, 0.6);
+  --border-card: rgba(40, 42, 54, 0.08);
+  --border-hover: rgba(189, 147, 249, 0.2);
+  --shadow-main: 0 10px 40px rgba(40, 42, 54, 0.04);
+  --blur-amount: 20px;
+  --accent-color-1: #bd93f9;
+  --accent-color-2: #ff79c6;
+  --accent-glow: rgba(189, 147, 249, 0.12);
+  --accent-gradient: linear-gradient(135deg, var(--accent-color-1) 0%, var(--accent-color-2) 100%);
+}
+
+/* ------------------------------------------------------------------------
+   THEME 8: CYBERPUNK (Neon Cyber)
+   ------------------------------------------------------------------------ */
+.theme-cyberpunk.theme-dark {
+  --bg-color: #080010;
+  --text-main: #00ffff;
+  --text-muted: #9d00ff;
+  --bg-card: rgba(10, 0, 25, 0.6);
+  --border-card: rgba(0, 255, 255, 0.12);
+  --border-hover: rgba(255, 0, 128, 0.4);
+  --shadow-main: 0 10px 45px rgba(0, 0, 0, 0.45);
+  --blur-amount: 24px;
+  --accent-color-1: #ff007f;
+  --accent-color-2: #00ffff;
+  --accent-glow: rgba(255, 0, 128, 0.25);
+  --accent-gradient: linear-gradient(135deg, var(--accent-color-1) 0%, var(--accent-color-2) 100%);
+}
+.theme-cyberpunk.theme-light {
+  --bg-color: #fff0f5;
+  --text-main: #9d00ff;
+  --text-muted: #ff007f;
+  --bg-card: rgba(255, 255, 255, 0.8);
+  --border-card: rgba(255, 0, 128, 0.15);
+  --border-hover: rgba(0, 255, 255, 0.4);
+  --shadow-main: 0 10px 40px rgba(255, 0, 128, 0.05);
+  --blur-amount: 20px;
+  --accent-color-1: #ff007f;
+  --accent-color-2: #00bfff;
+  --accent-glow: rgba(255, 0, 128, 0.15);
+  --accent-gradient: linear-gradient(135deg, var(--accent-color-1) 0%, var(--accent-color-2) 100%);
 }
 
 /* Reset basics */
@@ -66,7 +294,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* 2. Ambient Background Glow Blobs */
+/* 2. Abstract Ambient Background Glow Blobs */
 .glow-bg {
   position: fixed;
   top: 0;
@@ -87,7 +315,7 @@ body {
   opacity: 0.38;
   mix-blend-mode: screen;
   pointer-events: none;
-  transition: all 1s ease-in-out;
+  transition: all 0.8s ease-in-out;
 }
 
 .theme-light .blob {
@@ -583,6 +811,26 @@ body.has-wallpaper::before {
   box-shadow: 0 0 0 2px var(--accent-glow);
 }
 
+/* File upload styling */
+.file-upload-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.file-upload-wrapper .btn {
+  white-space: nowrap;
+}
+
+#local-bg-filename {
+  font-size: 0.72rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 180px;
+}
+
 .help-text {
   font-size: 0.7rem;
   color: var(--text-muted);
@@ -677,44 +925,6 @@ body.has-wallpaper::before {
 
 .theme-light .segment-btn.active {
   background: #ffffff;
-}
-
-/* Preset swatches */
-.background-options-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 0.6rem;
-}
-
-.bg-swatch {
-  aspect-ratio: 1;
-  border-radius: 50%;
-  cursor: pointer;
-  position: relative;
-  border: 2px solid transparent;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-  transition: transform var(--transition-fast);
-}
-
-.bg-swatch:hover {
-  transform: scale(1.15);
-}
-
-.bg-swatch.active {
-  border-color: #ffffff;
-  transform: scale(1.05);
-}
-
-.bg-swatch.active::after {
-  content: '✓';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: #ffffff;
-  font-size: 0.7rem;
-  font-weight: bold;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
 }
 
 .sidebar-footer {
